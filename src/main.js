@@ -2,43 +2,26 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
-// SimpleLightbox
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
-
 // import functions
-import { responseData } from './js/pixabay-api';
+import { getImages } from './js/pixabay-api';
 import { renderGallery, cleanGallery } from './js/render-functions';
 
-const form = document.querySelector(`.form`);
+const form = document.querySelector('.form');
+const loader = document.querySelector('.loader');
 
-let gallery = new SimpleLightbox('.gallery a', {
-  captions: true,
-  captionsData: 'alt',
-  captionType: 'attr',
+form.addEventListener(`submit`, onFormSubmit);
 
-  captionPosition: 'bottom',
-});
-
-gallery.on('show.simplelightbox', function () {});
-
-gallery.on('error.simplelightbox', function (e) {
-  console.log(e);
-});
-
-form.addEventListener(`submit`, toSearchImg);
-
-function toSearchImg(event) {
+function onFormSubmit(event) {
   event.preventDefault();
-  const userInp = event.currentTarget.elements.searchText.value.trim();
-  if (!userInp) {
+  const userAnswer = event.currentTarget.elements.searchText.value.trim();
+  if (!userAnswer) {
     return;
   }
   cleanGallery();
-  form.reset();
-  responseData(userInp)
-    .then(data => {
-      if (data.hits.length === 0) {
+  showLoader();
+  getImages(userAnswer)
+    .then(({ hits }) => {
+      if (hits.length === 0) {
         iziToast.error({
           title: 'Error',
           message:
@@ -46,15 +29,25 @@ function toSearchImg(event) {
         });
         return;
       }
-      console.log(data.hits);
-      renderGallery(data.hits);
-      gallery.refresh();
+      renderGallery(hits);
     })
     .catch(error => {
+      console.log(error);
       iziToast.error({
         title: 'Error',
         message:
           'Sorry, there are no images matching your search query. Please try again',
       });
+    })
+    .finally(() => {
+      form.reset();
+      hideLoader();
     });
+}
+
+function showLoader() {
+  loader.style.display = 'flex';
+}
+function hideLoader() {
+  loader.style.display = 'none';
 }
