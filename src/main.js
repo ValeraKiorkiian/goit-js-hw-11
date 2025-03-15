@@ -14,6 +14,7 @@ const iziToastContent = {
   messageColor: '#fff',
   backgroundColor: '#ef4040',
   theme: 'dark',
+  maxWidth: '432px',
 };
 
 const form = document.querySelector('.form');
