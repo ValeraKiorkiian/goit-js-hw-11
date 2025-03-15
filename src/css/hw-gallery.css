@@ -54,8 +54,11 @@
   overflow: hidden;
   height: 200px;
   max-width: calc((100% - 48px) / 3);
+  transition: transform 0.3s;
 }
-
+.gallery-item:hover {
+  transform: scale(1.1);
+}
 .description-container {
   padding: 4px 0 4px 0;
   position: absolute;
